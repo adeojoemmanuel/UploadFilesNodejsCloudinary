@@ -28,9 +28,21 @@ app.post('/uploadfile', (req, res) => {
             return res.status(200).send(config.messages.FILE_EXCEEDED_LIMIT);
         }
 
-        cloudinary.uploader.upload(files.file.path, (result) => {
-            res.status(200).send(result);
-        })
+        const resource_type = _file.type.includes('image') ? 'image' : 'video';
+
+        cloudinary.uploader.upload_large(_file.path, (result) => {
+
+            const { format, url, secure_url } = result;
+
+            res.status(200).send({
+                file_format: format,
+                url: {
+                    http: url,
+                    https: secure_url
+                }
+            });
+
+        }, { resource_type })
 
     })
 
